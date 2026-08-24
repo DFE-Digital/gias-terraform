@@ -1,0 +1,16 @@
+.terraform
+*-export
+
+# vscode directory
+.vscode
+
+# templates
+
+# terraform modules
+
+# macOS files
+.DS_Store
+
+# Ignore Jetbrains IDE settings
+.idea
+

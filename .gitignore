@@ -14,3 +14,9 @@
 # Ignore Jetbrains IDE settings
 .idea
 
+# Terraform
+.terraform
+terraform/application/vendor
+terraform/domains/environment_domains/vendor
+terraform/domains/infrastructure/vendor
+terraform.tfstate*

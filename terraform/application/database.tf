@@ -1,7 +1,7 @@
 module "managed-redis-api" {
   source = "./vendor/modules/azure//azure/redis_managed"
 
-  count                 = var.deploy_managed_redis ? 1 : 0
+  count = var.deploy_managed_redis ? 1 : 0
 
   name                  = "api"
   environment           = var.environment
@@ -22,7 +22,7 @@ module "managed-redis-api" {
 module "managed-redis-fe" {
   source = "./vendor/modules/azure//azure/redis_managed"
 
-  count                 = var.deploy_managed_redis ? 1 : 0
+  count = var.deploy_managed_redis ? 1 : 0
 
   name                  = "front-end"
   environment           = var.environment

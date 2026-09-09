@@ -47,6 +47,8 @@ module "storage-edubase" {
   infrastructure_encryption_enabled = true
   create_encryption_scope           = false
   use_private_storage               = var.use_private_storage
+  cross_tenant_replication_enabled  = true
+  blob_versioning_enabled           = true
   # Create containers for the application (all containers are private)
   containers = [
     { name = "extracts" },

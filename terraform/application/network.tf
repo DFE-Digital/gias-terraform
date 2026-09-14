@@ -12,4 +12,5 @@ module "network" {
   enable_redis          = true
   enable_postgres       = false
   enable_sql            = true
+  enable_apps           = true
 }

@@ -6,5 +6,5 @@ module "data_factory" {
     service_short = var.service_short
     config_short = var.config_short
     git_enabled_environment = "na"
-    azure_enable_monitoring = false
+    azure_enable_monitoring = var.azure_enable_monitoring
 }

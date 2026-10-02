@@ -111,3 +111,15 @@ variable "deploy_managed_redis" {
   type        = bool
   default     = true
 }
+
+variable "azure_enable_monitoring" {
+  description = "Whether to enable azure monitoring"
+  type        = bool
+  default     = false
+}
+
+variable "git_enabled_environment" {
+  description = "Whether to connect the azure data factory to a github account for flows or not"
+  type        = string
+  default     = "na"
+}

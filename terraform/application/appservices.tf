@@ -220,7 +220,7 @@ module "gias_web_app" {
     SASimulatorGuid                                  = "kvsecret"
     "ServiceProvider.Certificate.Thumbprint"         = "kvsecret"
     SnapshotDebugger_EXTENSION_VERSION               = "~1"
-    SQLDatabase                                      = "t1dv-edubase "
+    SQLDatabase                                      = "t1dv-edubase"
     SQLServer                                        = "s158d01-gias-dv-edubase-sql.database.windws.net"
     TexunaApiBaseAddress                             = "https://s158d01-gias-edubase-api-wa.azurewebsites.net/edubase/rest/"
     WEBSITE_APPINSIGHTS_ENCRYPTEDAPIKEY              = "kvsecret"

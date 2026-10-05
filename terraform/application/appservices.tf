@@ -19,7 +19,7 @@ module "edubase_web_app" {
     }
   }
   application_stack = {
-    java_version = "1.8"
+    java_version = "JAVA - 1.8"
   }
   app_settings = {
     APPINSIGHTS_INSTRUMENTATIONKEY                    = ""
@@ -95,7 +95,7 @@ module "edubase_web_app_api" {
     }
   }
   application_stack = {
-    java_version = "1.8"
+    java_version = "JAVA - 1.8"
   }
   app_settings = {
     APPINSIGHTS_INSTRUMENTATIONKEY                    = ""

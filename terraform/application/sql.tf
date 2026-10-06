@@ -8,22 +8,22 @@ module "sql-test" {
   service_short         = var.service_short
   config_short          = var.config_short
 
-  databases = {
-    edubase = {
-      server_name_suffix                  = "edubase"
-      azure_sql_sku                       = "BC_Gen5_2"
-      storage_account_type                = "Local"
-      lt_ret_pol_weekly_retention         = "P4W"
-      st_ret_pol_backup_interval_in_hours = 24
-      st_ret_pol_retention_days           = 14
-    }
-    sandbox = {
-      server_name_suffix                  = "edubase-sandbox1"
-      azure_sql_sku                       = "GP_Gen5_2"
-      storage_account_type                = "Local"
-      st_ret_pol_backup_interval_in_hours = 24
-    }
-  }
+  # databases = {
+  #   edubase = {
+  #     server_name_suffix                  = "edubase"
+  #     azure_sql_sku                       = "BC_Gen5_2"
+  #     storage_account_type                = "Local"
+  #     lt_ret_pol_weekly_retention         = "P4W"
+  #     st_ret_pol_backup_interval_in_hours = 24
+  #     st_ret_pol_retention_days           = 14
+  #   }
+  #   sandbox = {
+  #     server_name_suffix                  = "edubase-sandbox1"
+  #     azure_sql_sku                       = "GP_Gen5_2"
+  #     storage_account_type                = "Local"
+  #     st_ret_pol_backup_interval_in_hours = 24
+  #   }
+  # }
 
   private_endpoint_subnet_id = module.network.sql_subnet
   private_endpoints = {

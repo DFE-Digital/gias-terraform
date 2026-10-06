@@ -1,0 +1,24 @@
+---
+name: Lint
+
+on: pull_request
+
+jobs:
+  terraform-format:
+    name: Terraform Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.5"
+      - name: Check formatting
+        run: terraform fmt -recursive -check
+
+  yaml:
+    name: YAML
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check formatting
+        uses: karancode/yamllint-github-action@v2.1.1

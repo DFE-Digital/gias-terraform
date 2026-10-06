@@ -11,16 +11,16 @@ on:
         type: choice
         default: development
         options:
-        - development
-        - test
-        - preproduction
-        - production
+          - development
+          - test
+          - preproduction
+          - production
   push:
-   branches:
-    - main
+    branches:
+      - main
   pull_request:
     branches:
-    - main
+      - main
     types: [opened, reopened, synchronize, labeled]
 
 env:
@@ -42,22 +42,22 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        environment: [development] # [development, test, preproduction, production]
+        environment: [development]  # [development, test, preproduction, production]
 
     steps:
-    - name: Deploy app to ${{ matrix.environment }}
-      id: deploy_app
-      uses: DFE-Digital/github-actions/deploy-to-aks@master
-      with:
-        azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        environment: ${{ matrix.environment }}
-        sha: ${{ needs.build.outputs.docker-image-tag }}
-        terraform-base: ${{ env.TERRAFORM_BASE }}
-        healthcheck: ${{ env.HEALTHCHECK_CMD }}
-        teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
-        service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
+      - name: Deploy app to ${{ matrix.environment }}
+        id: deploy_app
+        uses: DFE-Digital/github-actions/deploy-to-aks@master
+        with:
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          environment: ${{ matrix.environment }}
+          sha: ${{ needs.build.outputs.docker-image-tag }}
+          terraform-base: ${{ env.TERRAFORM_BASE }}
+          healthcheck: ${{ env.HEALTHCHECK_CMD }}
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
 
   manual_deploy:
     name: Manual deploy
@@ -71,24 +71,24 @@ jobs:
       pull-requests: write
 
     steps:
-    - name: Deploy app to ${{ inputs.environment }}
-      id: deploy_manual
-      uses: DFE-Digital/github-actions/deploy-to-aks@master
-      with:
-        azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        environment: ${{ inputs.environment }}
-        pr-number: ${{ inputs.pull-request-number }}
-        sha: ${{ inputs.docker-image-tag }}
-        terraform-base: ${{ env.TERRAFORM_BASE }}
-        healthcheck: ${{ env.HEALTHCHECK_CMD }}
-        teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
-        service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
-        # smoke-test: true
-        db-seed: ${{ inputs.environment == 'review' && 'true' || 'false' }}
-        gcp-wip: projects/712009772377/locations/global/workloadIdentityPools/find-placement-schools/providers/find-placement-schools
-        gcp-project-id: rugged-abacus-218110
+      - name: Deploy app to ${{ inputs.environment }}
+        id: deploy_manual
+        uses: DFE-Digital/github-actions/deploy-to-aks@master
+        with:
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          environment: ${{ inputs.environment }}
+          pr-number: ${{ inputs.pull-request-number }}
+          sha: ${{ inputs.docker-image-tag }}
+          terraform-base: ${{ env.TERRAFORM_BASE }}
+          healthcheck: ${{ env.HEALTHCHECK_CMD }}
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
+          # smoke-test: true
+          db-seed: ${{ inputs.environment == 'review' && 'true' || 'false' }}
+          gcp-wip: projects/712009772377/locations/global/workloadIdentityPools/find-placement-schools/providers/find-placement-schools
+          gcp-project-id: rugged-abacus-218110
 
   deploy_domains_infra:
     name: Deploy Domains Infrastructure
@@ -102,14 +102,14 @@ jobs:
       id-token: write
 
     steps:
-    - name: Deploy Domains Infrastructure
-      uses: DFE-Digital/github-actions/deploy-domains-infra@master
-      with:
-        azure-client-id:  ${{ secrets.AZURE_CLIENT_ID  }}
-        azure-tenant-id:  ${{ secrets.AZURE_TENANT_ID   }}
-        azure-subscription-id:  ${{ secrets.AZURE_SUBSCRIPTION_ID   }}
-        teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
-        service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
+      - name: Deploy Domains Infrastructure
+        uses: DFE-Digital/github-actions/deploy-domains-infra@master
+        with:
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
 
   deploy_domains_env:
     name: Deploy Domains to ${{ matrix.domain_environment }} environment
@@ -127,13 +127,13 @@ jobs:
       id-token: write
 
     steps:
-    - name: Deploy Domains Environment
-      uses: DFE-Digital/github-actions/deploy-domains-env@master
-      with:
-        azure-client-id:  ${{ secrets.AZURE_CLIENT_ID  }}
-        azure-tenant-id:  ${{ secrets.AZURE_TENANT_ID   }}
-        azure-subscription-id:  ${{ secrets.AZURE_SUBSCRIPTION_ID   }}
-        environment: ${{ matrix.domain_environment }}
-        healthcheck: healthcheck
-        teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
-        service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
+      - name: Deploy Domains Environment
+        uses: DFE-Digital/github-actions/deploy-domains-env@master
+        with:
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          environment: ${{ matrix.domain_environment }}
+          healthcheck: healthcheck
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}

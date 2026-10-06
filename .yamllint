@@ -1,0 +1,10 @@
+---
+extends: default
+
+rules:
+  document-start: disable
+  truthy:
+    ignore: |
+      **/workflows/*.yml
+      **/workflows/*.yaml
+  line-length: disable

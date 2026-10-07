@@ -1,0 +1,147 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Build and Deploy
+concurrency: build_and_deploy_${{ github.ref_name }}
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types: [opened, reopened, synchronize, labeled]
+
+permissions:
+  contents: write
+  deployments: write
+  id-token: write
+  packages: write
+  pull-requests: write
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_IMAGE: ghcr.io/dfe-digital/gias-terraform
+    outputs:
+      IMAGE_TAG: ${{ steps.build-image.outputs.tag }}
+      GIT_BRANCH: ${{ env.GIT_BRANCH }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set docker image tag (push)
+        if: github.event_name == 'push'
+        run: |
+          GIT_REF=${{ github.ref }}
+          echo "GIT_BRANCH=${GIT_REF##*/}" >> $GITHUB_ENV # GIT_BRANCH will be main for refs/heads/main
+
+      - name: Set docker image tag (pull_request)
+        if: github.event_name == 'pull_request'
+        run: |
+          # This is the actual PR branch
+          GIT_REF=${{ github.head_ref }}
+          echo "GIT_BRANCH=${GIT_REF##*/}" >> $GITHUB_ENV
+
+      - name: Build Docker Image
+        id: build-image
+        uses: DFE-Digital/github-actions/build-docker-image@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          context: ""
+          reuse-cache: true
+          max-cache: false
+          docker-repository: ${{ env.DOCKER_IMAGE }}
+
+  deploy-before-production:
+    name: Parallel deployment before production
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: ${{ matrix.environment }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: [development]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Deploy to ${{ matrix.environment }}
+        id: deploy_before_production
+        uses: DFE-Digital/github-actions/deploy-to-aks@master
+        with:
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          environment: ${{ matrix.environment }}
+          sha: ${{ github.sha }}
+
+  deploy-production:
+    name: Production deployment
+    if: github.event_name == 'push' && github.ref == 'refs/heads/change_to_main'
+    environment:
+      name: production
+      url: ${{ steps.deploy_azure_prod.outputs.deploy-url }}
+    needs: [deploy-before-production]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Deploy Azure resources to production
+        id: deploy_azure_prod
+        uses: DFE-Digital/github-actions/deploy-to-aks@master
+        with:
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          environment: production
+          sha: ${{ github.sha }}
+
+  deploy_domains_infra:
+    name: Deploy Domains Infrastructure
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    concurrency: deploy_domains_infra
+    needs: [deploy-production]
+    environment:
+      name: production
+
+    steps:
+      - name: Deploy Domains Infrastructure
+        id: deploy_domains_infra
+        uses: DFE-Digital/github-actions/deploy-domains-infra@master
+        with:
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          terraform-base: terraform/custom_domains/infrastructure
+
+  deploy_domains_env:
+    name: Deploy Domains to ${{ matrix.domain_environment }} environment
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    concurrency: deploy_domains_env_${{ matrix.domain_environment }}
+    needs: [deploy_domains_infra]
+    strategy:
+      max-parallel: 1
+      matrix:
+        domain_environment: [development, preproduction, test, production]
+    environment:
+      name: production
+
+    steps:
+      - name: Deploy Domains Environment
+        id: deploy_domains_env
+        uses: DFE-Digital/github-actions/deploy-domains-env@master
+        with:
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          environment: ${{ matrix.domain_environment }}
+          healthcheck: integrations/monitoring/
+          terraform-base: terraform/custom_domains/environment_domains

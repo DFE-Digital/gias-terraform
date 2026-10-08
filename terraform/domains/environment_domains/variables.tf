@@ -20,14 +20,15 @@ variable "rate_limit_max" {
 
 variable "rate_limit" {
   type = list(object({
-    agent        = optional(string)
-    priority     = optional(number)
-    duration     = optional(number)
-    limit        = optional(number)
-    selector     = optional(string)
-    operator     = optional(string)
-    match_values = optional(list(string))
-    type         = optional(string)
+    agent          = optional(string)
+    priority       = optional(number)
+    duration       = optional(number)
+    limit          = optional(number)
+    match_variable = optional(string)
+    selector       = optional(string)
+    operator       = optional(string)
+    match_values   = optional(list(string))
+    type           = optional(string)
   }))
   default = null
 }

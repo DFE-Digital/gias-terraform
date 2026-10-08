@@ -8,6 +8,8 @@ module "sql-test" {
   service_short         = var.service_short
   config_short          = var.config_short
 
+  # Leave these commented out for now, as we don't want to create any databases yet.
+  # They will be created through goe-replication, and then we can add them to the terraform config later.
   # databases = {
   #   edubase = {
   #     server_name_suffix                  = "edubase"

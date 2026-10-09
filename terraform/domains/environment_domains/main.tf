@@ -14,3 +14,9 @@ module "domains" {
   rate_limit_max      = try(var.rate_limit_max, false)
   rate_limit          = try(var.rate_limit, null)
 }
+
+# Takes values from hosted_zone.domain_name.cnames (or txt_records, a-records). Use for domains which are not associated with front door.
+module "dns_records" {
+  source      = "./vendor/modules/domains//dns/records"
+  hosted_zone = var.hosted_zone
+}

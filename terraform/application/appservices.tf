@@ -10,6 +10,7 @@ module "edubase_web_app" {
   service_short      = "gias"
   config_short       = var.config_short
   sp_sku_name        = "S3"
+  subnet_id          = module.network.apps_subnet
   logs = {
     http_logs = {
       file_system = {
@@ -86,6 +87,7 @@ module "edubase_web_app_api" {
   service_short      = "gias"
   config_short       = var.config_short
   sp_sku_name        = "S3"
+  subnet_id          = module.network.apps_subnet
   logs = {
     http_logs = {
       file_system = {
@@ -162,6 +164,7 @@ module "gias_web_app" {
   service_short      = "gias"
   config_short       = var.config_short
   sp_sku_name        = "S3"
+  subnet_id          = module.network.apps_subnet
   logs = {
     http_logs = {
       file_system = {

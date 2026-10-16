@@ -3,11 +3,11 @@ module "edubase_web_app" {
 
   app_type           = "web"
   web_app_name       = "edubase"
-  subscription_short = "s158"
+  subscription_short = var.subscription_short
   env_short          = var.env_short
   environment        = var.environment
   service_name       = var.service_name
-  service_short      = "gias"
+  service_short      = var.service_short
   config_short       = var.config_short
   sp_sku_name        = "S3"
   logs = {
@@ -22,7 +22,6 @@ module "edubase_web_app" {
     java_version = "JAVA - 1.8"
   }
   app_settings = {
-    APPINSIGHTS_INSTRUMENTATIONKEY      = ""
     APPINSIGHTS_PROFILERFEATURE_VERSION = "1.0.0"
     APPINSIGHTS_SNAPSHOTFEATURE_VERSION = "1.0.0"
 
@@ -32,7 +31,6 @@ module "edubase_web_app" {
       }
     })
 
-    APPLICATIONINSIGHTS_CONNECTION_STRING            = ""
     APPLICATIONINSIGHTS_INSTRUMENTATION_JDBC_ENABLED = "true"
     ApplicationInsightsAgent_EXTENSION_VERSION       = "~2"
     DiagnosticServices_EXTENSION_VERSION             = "~3"
@@ -79,11 +77,11 @@ module "edubase_web_app_api" {
 
   app_type           = "web"
   web_app_name       = "edubase-api"
-  subscription_short = "s158"
+  subscription_short = var.subscription_short
   env_short          = var.env_short
   environment        = var.environment
   service_name       = var.service_name
-  service_short      = "gias"
+  service_short      = var.service_short
   config_short       = var.config_short
   sp_sku_name        = "S3"
   logs = {
@@ -98,7 +96,6 @@ module "edubase_web_app_api" {
     java_version = "JAVA - 1.8"
   }
   app_settings = {
-    APPINSIGHTS_INSTRUMENTATIONKEY      = ""
     APPINSIGHTS_PROFILERFEATURE_VERSION = "1.0.0"
     APPINSIGHTS_SNAPSHOTFEATURE_VERSION = "1.0.0"
 
@@ -108,7 +105,6 @@ module "edubase_web_app_api" {
       }
     })
 
-    APPLICATIONINSIGHTS_CONNECTION_STRING            = ""
     APPLICATIONINSIGHTS_INSTRUMENTATION_JDBC_ENABLED = "true"
     ApplicationInsightsAgent_EXTENSION_VERSION       = "~2"
     DiagnosticServices_EXTENSION_VERSION             = "~3"
@@ -155,11 +151,11 @@ module "gias_web_app" {
 
   app_type           = "web"
   web_app_name       = "gias"
-  subscription_short = "s158"
+  subscription_short = var.subscription_short
   env_short          = var.env_short
   environment        = var.environment
   service_name       = var.service_name
-  service_short      = "gias"
+  service_short      = var.service_short
   config_short       = var.config_short
   sp_sku_name        = "S3"
   logs = {
@@ -176,7 +172,6 @@ module "gias_web_app" {
   app_settings = {
     AllowedForwardedHostNames                       = "dev1.get-information-schools.service.gov.uk,www.dev1.get-information-schools.service.gov.uk"
     "api:Password"                                  = module.application_secrets.map.gias-api-Password
-    APPINSIGHTS_INSTRUMENTATIONKEY                  = ""
     APPINSIGHTS_PROFILERFEATURE_VERSION             = "1.0.0"
     APPINSIGHTS_SNAPSHOTFEATURE_VERSION             = "1.0.0"
     ApplicationInsightsAgent_EXTENSION_VERSION      = "~2"
@@ -291,11 +286,11 @@ module "dfe-signinsimulator" {
 
   app_type           = "web"
   web_app_name       = "dfe-signinsimulator"
-  subscription_short = "s158"
+  subscription_short = var.subscription_short
   env_short          = var.env_short
   environment        = var.environment
   service_name       = var.service_name
-  service_short      = "gias"
+  service_short      = var.service_short
   config_short       = var.config_short
   sp_sku_name        = "S3"
   logs = {

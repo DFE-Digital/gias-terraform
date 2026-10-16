@@ -21,6 +21,7 @@ variable "rate_limit_max" {
 variable "rate_limit" {
   type = list(object({
     agent          = optional(string)
+    action         = optional(string)
     priority       = optional(number)
     duration       = optional(number)
     limit          = optional(number)

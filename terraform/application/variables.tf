@@ -156,3 +156,9 @@ variable "ga_wif_immutable_repos" {
   EOT
   default     = {}
 }
+
+variable "create_log_analytics_workspace" {
+  type        = bool
+  description = "Whether to create a new Log Analytics Workspace or use an existing one."
+  default     = false
+}

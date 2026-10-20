@@ -1,16 +1,24 @@
+# module "monitoring" {
+#   source = "./vendor/modules/azure//azure/app_service"
+
+#   create_log_analytics_workspace = true
+#   web_app_name = "monitoring"
+# }
+
 module "edubase_web_app" {
   source = "./vendor/modules/azure//azure/app_service"
 
-  app_type           = "web"
-  web_app_name       = "edubase"
-  subscription_short = var.subscription_short
-  env_short          = var.env_short
-  environment        = var.environment
-  service_name       = var.service_name
-  service_short      = var.service_short
-  config_short       = var.config_short
-  sp_sku_name        = "S3"
-  subnet_id          = module.network.apps_subnet
+  app_type                       = "web"
+  web_app_name                   = "edubase"
+  subscription_short             = var.subscription_short
+  env_short                      = var.env_short
+  environment                    = var.environment
+  service_name                   = var.service_name
+  service_short                  = var.service_short
+  config_short                   = var.config_short
+  sp_sku_name                    = "S3"
+  subnet_id                      = module.network.apps_subnet
+  create_log_analytics_workspace = true
   logs = {
     http_logs = {
       file_system = {
@@ -76,16 +84,17 @@ module "edubase_web_app" {
 module "edubase_web_app_api" {
   source = "./vendor/modules/azure//azure/app_service"
 
-  app_type           = "web"
-  web_app_name       = "edubase-api"
-  subscription_short = var.subscription_short
-  env_short          = var.env_short
-  environment        = var.environment
-  service_name       = var.service_name
-  service_short      = var.service_short
-  config_short       = var.config_short
-  sp_sku_name        = "S3"
-  subnet_id          = module.network.apps_subnet
+  app_type                   = "web"
+  web_app_name               = "edubase-api"
+  subscription_short         = var.subscription_short
+  env_short                  = var.env_short
+  environment                = var.environment
+  service_name               = var.service_name
+  service_short              = var.service_short
+  config_short               = var.config_short
+  sp_sku_name                = "S3"
+  subnet_id                  = module.network.apps_subnet
+  log_analytics_workspace_id = module.edubase_web_app.workspace_id
   logs = {
     http_logs = {
       file_system = {
@@ -151,16 +160,17 @@ module "edubase_web_app_api" {
 module "gias_web_app" {
   source = "./vendor/modules/azure//azure/app_service"
 
-  app_type           = "web"
-  web_app_name       = "gias"
-  subscription_short = var.subscription_short
-  env_short          = var.env_short
-  environment        = var.environment
-  service_name       = var.service_name
-  service_short      = var.service_short
-  config_short       = var.config_short
-  sp_sku_name        = "S3"
-  subnet_id          = module.network.apps_subnet
+  app_type                   = "web"
+  web_app_name               = "gias"
+  subscription_short         = var.subscription_short
+  env_short                  = var.env_short
+  environment                = var.environment
+  service_name               = var.service_name
+  service_short              = var.service_short
+  config_short               = var.config_short
+  sp_sku_name                = "S3"
+  subnet_id                  = module.network.apps_subnet
+  log_analytics_workspace_id = module.edubase_web_app.workspace_id
   logs = {
     http_logs = {
       file_system = {
@@ -287,15 +297,16 @@ module "gias_web_app" {
 module "dfe-signinsimulator" {
   source = "./vendor/modules/azure//azure/app_service"
 
-  app_type           = "web"
-  web_app_name       = "dfe-signinsimulator"
-  subscription_short = var.subscription_short
-  env_short          = var.env_short
-  environment        = var.environment
-  service_name       = var.service_name
-  service_short      = var.service_short
-  config_short       = var.config_short
-  sp_sku_name        = "S3"
+  app_type                   = "web"
+  web_app_name               = "dfe-signinsimulator"
+  subscription_short         = var.subscription_short
+  env_short                  = var.env_short
+  environment                = var.environment
+  service_name               = var.service_name
+  service_short              = var.service_short
+  config_short               = var.config_short
+  sp_sku_name                = "S3"
+  log_analytics_workspace_id = module.edubase_web_app.workspace_id
   logs = {
     http_logs = {
       file_system = {

@@ -1,0 +1,159 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+# test
+
+name: Terraform Deploy
+
+concurrency:
+  group: terraform_${{ github.ref_name }}
+  cancel-in-progress: false
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+jobs:
+
+  terraform-plan:
+    name: Terraform Plan (${{ matrix.environment }})
+
+    if: github.event_name == 'pull_request'
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        environment:
+          - development
+          # - preproduction
+          # - test
+          # - production
+
+    environment:
+      name: ${{ matrix.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Determine Terraform Version
+        id: terraform-version
+        run: |
+          terraform_version=$(awk '/{/{f=/^terraform/;next}f' terraform/application/terraform.tf | grep -o '[0-9\.]*' | head -1)
+          echo "version=$terraform_version" >> $GITHUB_OUTPUT
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ steps.terraform-version.outputs.version }}
+          terraform_wrapper: false
+
+      - name: Azure Login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Terraform Plan
+        run: |
+          make ci ${{ matrix.environment }} terraform-plan
+
+  deploy-nonprod:
+    name: Deploy (${{ matrix.environment }})
+
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        environment:
+          - development
+          # - preproduction
+          # - test
+
+    environment:
+      name: ${{ matrix.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Determine Terraform Version
+        id: terraform-version
+        run: |
+          terraform_version=$(awk '/{/{f=/^terraform/;next}f' terraform/application/terraform.tf | grep -o '[0-9\.]*' | head -1)
+          echo "version=$terraform_version" >> $GITHUB_OUTPUT
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ${{ steps.terraform-version.outputs.version }}
+          terraform_wrapper: false
+
+      - name: Azure Login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Terraform Apply
+        run: |
+          make ci ${{ matrix.environment }} terraform-apply
+
+  # deploy-production:
+  #   name: Deploy Production
+
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+  #   needs:
+  #     - deploy-nonprod
+
+  #   runs-on: ubuntu-latest
+
+  #   environment:
+  #     name: production
+
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v7
+
+  #     - name: Determine Terraform Version
+  #       id: terraform-version
+  #       run: |
+  #         terraform_version=$(awk '/{/{f=/^terraform/;next}f' terraform/application/terraform.tf | grep -o '[0-9\.]*' | head -1)
+  #         echo "version=$terraform_version" >> $GITHUB_OUTPUT
+
+  #     - name: Setup Terraform
+  #       uses: hashicorp/setup-terraform@v4
+  #       with:
+  #         terraform_version: ${{ steps.terraform-version.outputs.version }}
+  #         terraform_wrapper: false
+
+  #     - name: Azure Login
+  #       uses: azure/login@v3
+  #       with:
+  #         client-id: ${{ secrets.AZURE_CLIENT_ID }}
+  #         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+  #         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+  #     - name: Terraform Apply
+  #       run: |
+  #         make ci production terraform-apply

@@ -1,13 +1,14 @@
 module "sql-test" {
   source = "./vendor/modules/azure//azure/sql"
 
-  server_name_suffix    = "edubase"
-  environment           = var.environment
-  azure_resource_prefix = var.azure_resource_prefix
-  service_name          = var.service_name
-  service_short         = var.service_short
-  config_short          = var.config_short
-  key_vault_id          = module.infrastructure_secrets.key_vault_id
+  server_name_suffix                       = "edubase"
+  environment                              = var.environment
+  azure_resource_prefix                    = var.azure_resource_prefix
+  service_name                             = var.service_name
+  service_short                            = var.service_short
+  config_short                             = var.config_short
+  key_vault_id                             = module.infrastructure_secrets.key_vault_id
+  express_vulnerability_assessment_enabled = true
 
   # Leave these commented out for now, as we don't want to create any databases yet.
   # They will be created through goe-replication, and then we can add them to the terraform config later.

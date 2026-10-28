@@ -162,3 +162,17 @@ variable "create_log_analytics_workspace" {
   description = "Whether to create a new Log Analytics Workspace or use an existing one."
   default     = false
 }
+
+variable "environment_app_settings" {
+  type        = map(map(string))
+  description = "A map of key-value pairs to configure app settings differently by environment"
+  default     = {}
+}
+
+variable "environment_slots" {
+  type = map(object({
+    app_settings        = optional(map(string), {})
+    sticky_app_settings = optional(list(string), [])
+  }))
+  default = {}
+}

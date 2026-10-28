@@ -1,10 +1,3 @@
-# module "monitoring" {
-#   source = "./vendor/modules/azure//azure/app_service"
-
-#   create_log_analytics_workspace = true
-#   web_app_name = "monitoring"
-# }
-
 module "edubase_web_app" {
   source = "./vendor/modules/azure//azure/app_service"
 

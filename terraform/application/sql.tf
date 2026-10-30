@@ -7,6 +7,7 @@ module "sql-test" {
   service_name                             = var.service_name
   service_short                            = var.service_short
   config_short                             = var.config_short
+  entra_admin                              = var.sql_entra_admin
   key_vault_id                             = module.infrastructure_secrets.key_vault_id
   express_vulnerability_assessment_enabled = true
 

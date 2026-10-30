@@ -176,3 +176,9 @@ variable "environment_slots" {
   }))
   default = {}
 }
+
+variable "sql_entra_admin" {
+  type        = string
+  default     = ""
+  description = "The Entra group or individual that are allowed to use a database query editor in the portal"
+}

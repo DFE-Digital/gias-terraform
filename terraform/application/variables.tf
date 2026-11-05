@@ -182,3 +182,19 @@ variable "sql_entra_admin" {
   default     = ""
   description = "The Entra group or individual that are allowed to use a database query editor in the portal"
 }
+
+variable "sp_sku_name" {
+  type        = string
+  default     = "P0v3"
+  description = "The SKU name (Pricing plan) for the App Service Plan"
+}
+
+variable "service_plans" {
+  type = map(object({
+    sku_name                        = string
+    worker_count                    = optional(number)
+    os_type                         = optional(string, "Windows")
+    premium_plan_auto_scale_enabled = optional(bool, false)
+    maximum_elastic_worker_count    = optional(number)
+  }))
+}

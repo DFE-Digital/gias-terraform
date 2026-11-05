@@ -1,3 +1,21 @@
+module "service_plan" {
+  for_each = var.service_plans
+
+  source = "./vendor/modules/azure//azure/app_service_plan"
+
+  sp_infix                        = each.key
+  sp_sku_name                     = each.value.sku_name
+  worker_count                    = each.value.worker_count
+  sp_os_type                      = each.value.os_type
+  maximum_elastic_worker_count    = each.value.maximum_elastic_worker_count
+  premium_plan_auto_scale_enabled = each.value.premium_plan_auto_scale_enabled
+
+  subscription_short = var.subscription_short
+  env_short          = var.env_short
+  service_short      = var.service_short
+  config_short       = var.config_short
+}
+
 module "edubase_web_app" {
   source = "./vendor/modules/azure//azure/app_service"
 
@@ -9,7 +27,7 @@ module "edubase_web_app" {
   service_name                   = var.service_name
   service_short                  = var.service_short
   config_short                   = var.config_short
-  sp_sku_name                    = "S3"
+  service_plan_id                = module.service_plan["web-plan"].id
   subnet_id                      = module.network.apps_subnet
   create_log_analytics_workspace = true
   logs = {
@@ -21,7 +39,8 @@ module "edubase_web_app" {
     }
   }
   application_stack = {
-    java_version = "JAVA - 1.8"
+    java_version   = "1.8"
+    tomcat_version = "9.0"
   }
   app_settings = {
     APPINSIGHTS_PROFILERFEATURE_VERSION = "1.0.0"
@@ -85,7 +104,7 @@ module "edubase_web_app_api" {
   service_name               = var.service_name
   service_short              = var.service_short
   config_short               = var.config_short
-  sp_sku_name                = "S3"
+  service_plan_id            = module.service_plan["api-plan"].id
   subnet_id                  = module.network.apps_subnet
   log_analytics_workspace_id = module.edubase_web_app.workspace_id
   logs = {
@@ -97,7 +116,8 @@ module "edubase_web_app_api" {
     }
   }
   application_stack = {
-    java_version = "JAVA - 1.8"
+    java_version   = "1.8"
+    tomcat_version = "9.0"
   }
   app_settings = {
     APPINSIGHTS_PROFILERFEATURE_VERSION = "1.0.0"
@@ -161,7 +181,7 @@ module "gias_web_app" {
   service_name               = var.service_name
   service_short              = var.service_short
   config_short               = var.config_short
-  sp_sku_name                = "S3"
+  service_plan_id            = module.service_plan["web-plan"].id
   subnet_id                  = module.network.apps_subnet
   log_analytics_workspace_id = module.edubase_web_app.workspace_id
   logs = {
@@ -302,7 +322,7 @@ module "dfe-signinsimulator" {
   service_name               = var.service_name
   service_short              = var.service_short
   config_short               = var.config_short
-  sp_sku_name                = "S3"
+  service_plan_id            = module.service_plan["api-plan"].id
   log_analytics_workspace_id = module.edubase_web_app.workspace_id
   logs = {
     http_logs = {

@@ -17,9 +17,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - display: AKS infrastructure
+          - display: Azure infrastructure
             validation_plan: aks-infra
             terraform_base: terraform/application
+            terraform_version_file: terraform.tf
+          - display: Domains infrastructure
+            validation_plan: domains-infra
+            terraform_base: terraform/domains/infrastructure
+            terraform_version_file: terraform.tf
+          - display: Domains environment
+            validation_plan: domains-env
+            terraform_base: terraform/domains/environment_domains
             terraform_version_file: terraform.tf
 
     steps:

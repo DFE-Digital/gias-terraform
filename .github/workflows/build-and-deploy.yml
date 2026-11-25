@@ -19,6 +19,18 @@ on:
     branches:
       - main
 
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment"
+        required: true
+        type: choice
+        options:
+          - development
+          - test
+          - preproduction
+          - production
+
 permissions:
   contents: read
   id-token: write
@@ -73,7 +85,7 @@ jobs:
   deploy-nonprod:
     name: Deploy (${{ matrix.environment }})
 
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
 
     runs-on: ubuntu-latest
 
@@ -116,7 +128,7 @@ jobs:
   deploy-production:
     name: Deploy Production
 
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
 
     needs:
       - deploy-nonprod
@@ -150,3 +162,50 @@ jobs:
       - name: Terraform Apply
         run: |
           make ci production terraform-apply
+
+
+  deploy-domains-infra:
+    name: Deploy Domains Infrastructure
+    runs-on: ubuntu-latest
+    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
+    concurrency: deploy-domains-infra
+    needs: [deploy-production]
+    environment:
+      name: production
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Deploy Domains Infrastructure
+        id: deploy_domains_infra
+        uses: DFE-Digital/github-actions/deploy-domains-infra@3008-service-principal-login
+        with:
+          azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
+
+  deploy_domains_env:
+    name: Deploy Domains to ${{ matrix.domain_environment }} environment
+    runs-on: ubuntu-latest
+    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
+    concurrency: deploy-domains-${{ matrix.domain_environment }}
+    needs: [deploy-domains-infra]
+    strategy:
+      max-parallel: 1
+      matrix:
+        domain_environment: [development, test, preproduction, production]
+    environment:
+      name: production
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Deploy Domains Environment
+        id: deploy_domains_env
+        uses: DFE-Digital/github-actions/deploy-domains-env@3008-service-principal-login
+        with:
+          azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
+          environment: ${{ matrix.domain_environment }}
+          healthcheck: health
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}

@@ -167,9 +167,7 @@ jobs:
   deploy-domains-infra:
     name: Deploy Domains Infrastructure
     runs-on: ubuntu-latest
-    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
     concurrency: deploy-domains-infra
-    needs: [deploy-production]
     environment:
       name: production
     permissions:
@@ -187,11 +185,10 @@ jobs:
   deploy_domains_env:
     name: Deploy Domains to ${{ matrix.domain_environment }} environment
     runs-on: ubuntu-latest
-    if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || github.event_name == 'workflow_dispatch'
     concurrency: deploy-domains-${{ matrix.domain_environment }}
     needs: [deploy-domains-infra]
     strategy:
-      max-parallel: 1
+      max-parallel: 4
       matrix:
         domain_environment: [development, test, preproduction, production]
     environment:
@@ -206,6 +203,5 @@ jobs:
         with:
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
           environment: ${{ matrix.domain_environment }}
-          healthcheck: health
           teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
           service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}

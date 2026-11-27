@@ -178,7 +178,7 @@ jobs:
     steps:
       - name: Deploy Domains Infrastructure
         id: deploy_domains_infra
-        uses: DFE-Digital/github-actions/deploy-domains-infra@3008-service-principal-login
+        uses: DFE-Digital/github-actions/deploy-domains-infra@master
         with:
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
           teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
@@ -202,7 +202,7 @@ jobs:
     steps:
       - name: Deploy Domains Environment
         id: deploy_domains_env
-        uses: DFE-Digital/github-actions/deploy-domains-env@3008-service-principal-login
+        uses: DFE-Digital/github-actions/deploy-domains-env@master
         with:
           azure-credentials: ${{ secrets.AZURE_CREDENTIALS }}
           environment: ${{ matrix.domain_environment }}
